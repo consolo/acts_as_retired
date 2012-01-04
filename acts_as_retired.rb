@@ -1,5 +1,10 @@
 gem 'activerecord', '~> 2.3'
 
+##
+# &copy; 2010 Andrew Coleman
+# Released under MIT license.
+# http://www.opensource.org/licenses/mit-license.php
+#
 module ActsAsRetired
   def acts_as_retired
     class_eval do
