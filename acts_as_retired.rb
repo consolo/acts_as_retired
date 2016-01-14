@@ -8,8 +8,8 @@ gem 'activerecord'
 module ActsAsRetired
   def acts_as_retired
     class_eval do
-      named_scope :deleted, -> { where("#{table_name}.deleted_at IS NOT NULL") }
-      named_scope :active,  -> { where(deleted_at: nil) }
+      scope :deleted, -> { where("#{table_name}.deleted_at IS NOT NULL") }
+      scope :active,  -> { where(deleted_at: nil) }
       
       def destroy
         unless self.new_record?
