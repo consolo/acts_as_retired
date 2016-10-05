@@ -8,8 +8,8 @@ gem 'activerecord'
 module ActsAsRetired
   def acts_as_retired
     class_eval do
-      named_scope :deleted, :conditions => "#{table_name}.deleted_at IS NOT NULL"
-      named_scope :active, :conditions => { :deleted_at => nil }
+      scope :deleted, -> { where("#{table_name}.deleted_at IS NOT NULL") }
+      scope :active,  -> { where(deleted_at: nil) }
       
       def destroy
         unless self.new_record?
@@ -24,23 +24,20 @@ module ActsAsRetired
       end
       
       def self.for_select
-        active.all(:order => 'name ASC').collect do |gramps|
+        active.order('name ASC').all.map do |gramps|
           [ gramps.name, gramps.id.to_s ]
         end
       end
       
       def self.options_from_filter_params(filter)
-        conds = []
-        conds << retired_filter_conditions(filter)
-        
-        { :conditions => conds.compact.join(' AND ') }
+        retired_filter_conditions(filter)
       end
       
       def self.retired_filter_conditions(filter)
         if filter[:include_deleted].to_i == 1
-          nil
+          scoped
         else
-          "#{table_name}.deleted_at IS NULL"
+          scoped.active
         end
       end
     end
